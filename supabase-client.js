@@ -25,8 +25,41 @@ window.PortfolioDB = (function () {
       return null;
     }
     const c = getConfig();
-    client = window.supabase.createClient(c.supabaseUrl, c.supabaseAnonKey);
+    client = window.supabase.createClient(c.supabaseUrl, c.supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+      },
+    });
     return client;
+  }
+
+  /** 把 Supabase 錯誤翻成較好懂的中文 */
+  function friendlyAuthError(err) {
+    const msg = (err && (err.message || err.error_description || err.msg)) || String(err || "");
+    const lower = msg.toLowerCase();
+
+    if (lower.indexOf("failed to fetch") !== -1 || lower.indexOf("network") !== -1) {
+      return "無法連到 Supabase（網路或網址錯誤）。請確認 config.js 的 supabaseUrl，並用 F12→Console 看詳情。";
+    }
+    if (lower.indexOf("invalid login credentials") !== -1) {
+      return "Email 或密碼不正確。請到 Supabase → Authentication → Users 確認帳號，或重設密碼。";
+    }
+    if (lower.indexOf("email not confirmed") !== -1) {
+      return "此帳號尚未確認 Email。請在 Users 重新建立並勾選 Auto Confirm，或關閉「Confirm email」。";
+    }
+    if (lower.indexOf("user not found") !== -1) {
+      return "找不到此使用者。請在 Supabase Authentication → Users 用「Add user」建立後台帳號。";
+    }
+    if (lower.indexOf("signup is disabled") !== -1) {
+      return "目前不開放註冊。後台請用 Authentication → Users 手動新增的帳號登入。";
+    }
+    if (lower.indexOf("email logins are disabled") !== -1 || lower.indexOf("provider is not enabled") !== -1) {
+      return "Email 登入未開啟。請到 Authentication → Providers → Email 啟用。";
+    }
+    return msg || "登入失敗";
   }
 
   function publicImageUrl(row) {
@@ -131,7 +164,11 @@ window.PortfolioDB = (function () {
       email: email,
       password: password,
     });
-    if (error) throw error;
+    if (error) {
+      const e = new Error(friendlyAuthError(error));
+      e.cause = error;
+      throw e;
+    }
     return data;
   }
 

@@ -178,8 +178,12 @@ async function showLogin() {
 async function onLogin(e) {
   e.preventDefault();
   setError("");
+  setStatus("");
   const email = $("email").value.trim();
   const password = $("password").value;
+  const btn = e.target && e.target.querySelector
+    ? e.target.querySelector("[type=submit]")
+    : null;
 
   try {
     if (!window.PortfolioDB.isConfigured()) {
@@ -187,10 +191,23 @@ async function onLogin(e) {
         "請先在 config.js 填入 Supabase URL / anon key，並把 useDemoData 設為 false"
       );
     }
+    if (!email || !password) {
+      throw new Error("請輸入 Email 與密碼");
+    }
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "登入中…";
+    }
     await window.PortfolioDB.signIn(email, password);
     await showDashboard();
   } catch (err) {
+    console.error("[admin login]", err);
     setError(err.message || String(err));
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "登入";
+    }
   }
 }
 
