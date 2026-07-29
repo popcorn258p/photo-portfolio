@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robert · Photography</title>
+  <meta name="description" content="Robert 攝影作品集 — 旅行 / 生活 / 產品 / 活動" />
+  <meta name="theme-color" content="#F5F0E8" />
+
+  <!-- Google Tag Manager（請把 GTM-XXXXXXX 換成你的 ID；步驟見 教學-GTM一步一步.md） -->
+  <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-XXXXXXX');
+  </script>
+  <!-- End Google Tag Manager -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+
+  <header class="site-header">
+    <a href="#home" class="logo" data-track="nav_click" data-track-label="logo">ROBERT</a>
+    <nav class="nav" aria-label="主選單">
+      <a href="#gallery" data-track="nav_click" data-track-label="gallery">作品</a>
+      <a href="#about" data-track="nav_click" data-track-label="about">關於</a>
+      <a href="#contact" data-track="nav_click" data-track-label="contact">聯絡</a>
+      <a href="https://www.flickr.com/photos/robert_yen/" target="_blank" rel="noopener noreferrer"
+        data-site-flickr data-track="outbound_click" data-track-label="flickr_nav">Flickr</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Photography</p>
+        <h1>Robert</h1>
+        <p class="hero-sub">旅行 · 生活 · 產品 · 活動</p>
+        <div class="hero-actions">
+          <a href="#gallery" class="btn btn-primary" data-track="cta_click" data-track-label="view_gallery">
+            瀏覽作品
+          </a>
+          <a href="https://www.flickr.com/photos/robert_yen/" target="_blank" rel="noopener noreferrer"
+            class="btn btn-ghost" data-site-flickr data-track="outbound_click" data-track-label="flickr_hero">
+            完整 Flickr
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="section section-gallery">
+      <div class="section-head">
+        <h2>作品精選</h2>
+        <p>旅行、生活、產品與活動的光影紀錄</p>
+      </div>
+
+      <div class="filters" id="filters" role="group" aria-label="作品分類"></div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+
+    <section id="about" class="section section-alt">
+      <div class="about-grid">
+        <div>
+          <h2>關於</h2>
+          <p>
+            我是 Robert，用相機記錄旅行、生活空間、產品與活動現場。
+            更多作品可在
+            <a href="https://www.flickr.com/photos/robert_yen/" target="_blank" rel="noopener noreferrer"
+              data-site-flickr data-track="outbound_click" data-track-label="flickr_about">Flickr</a>
+            瀏覽。
+          </p>
+          <ul class="about-list">
+            <li>旅行 Travel</li>
+            <li>生活 Lifestyle</li>
+            <li>產品 Product</li>
+            <li>活動 Event</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h3>合作與拍攝</h3>
+          <ul>
+            <li>產品／形象靜態拍攝</li>
+            <li>活動、展場紀錄</li>
+            <li>旅行與生活影像</li>
+            <li>歡迎透過下方表單聯繫</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="section-head">
+        <h2>聯絡</h2>
+        <p>有拍攝或合作想法，歡迎留言</p>
+      </div>
+
+      <form id="contactForm" class="contact-form" novalidate>
+        <div class="field">
+          <label for="name">姓名</label>
+          <input id="name" name="name" type="text" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="message">訊息</label>
+          <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" data-track="cta_click" data-track-label="submit_form">
+          送出訊息
+        </button>
+        <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      © <span id="year"></span> Robert ·
+      <a href="https://www.flickr.com/photos/robert_yen/" target="_blank" rel="noopener noreferrer"
+        data-site-flickr data-track="outbound_click" data-track-label="flickr_footer">Flickr</a>
+    </p>
+  </footer>
+
+  <div id="lightbox" class="lightbox" hidden>
+    <button type="button" class="lightbox-close" aria-label="關閉" data-track="lightbox_close" data-track-label="close">&times;</button>
+    <img id="lightboxImg" alt="" />
+    <p id="lightboxCaption"></p>
+    <a id="lightboxFlickr" class="lightbox-flickr" href="#" target="_blank" rel="noopener noreferrer" hidden>
+      在 Flickr 開啟
+    </a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/tracking.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
