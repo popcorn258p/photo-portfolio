@@ -185,6 +185,84 @@ window.PortfolioDB = (function () {
     return data.session || null;
   }
 
+  /** 首頁 Banner 等站台設定（單列 id=1） */
+  async function fetchSiteSettings() {
+    const sb = getClient();
+    if (!sb) {
+      return {
+        hero_image_url: null,
+        hero_image_path: null,
+        hero_title: "",
+        hero_subtitle: "",
+        hero_overlay: 45,
+      };
+    }
+
+    const { data, error } = await sb
+      .from("site_settings")
+      .select("*")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (error) throw error;
+    return (
+      data || {
+        id: 1,
+        hero_image_url: null,
+        hero_image_path: null,
+        hero_title: "",
+        hero_subtitle: "",
+        hero_overlay: 45,
+      }
+    );
+  }
+
+  async function saveSiteSettings(payload) {
+    const sb = getClient();
+    if (!sb) throw new Error("尚未設定 Supabase");
+
+    const row = Object.assign({ id: 1 }, payload);
+    const { data, error } = await sb
+      .from("site_settings")
+      .upsert(row)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /** Banner 圖：path 優先走 Storage public URL */
+  function heroImageUrl(settings) {
+    if (!settings) return "";
+    if (settings.hero_image_url) return settings.hero_image_url;
+    if (settings.hero_image_path) {
+      return publicImageUrl({ image_path: settings.hero_image_path });
+    }
+    return "";
+  }
+
+  async function uploadHeroImage(file) {
+    const sb = getClient();
+    if (!sb) throw new Error("尚未設定 Supabase");
+
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const path =
+      "banner/hero-" +
+      Date.now() +
+      "-" +
+      Math.random().toString(36).slice(2, 8) +
+      "." +
+      ext;
+
+    const { error } = await sb.storage.from("photos").upload(path, file, {
+      cacheControl: "3600",
+      upsert: true,
+    });
+    if (error) throw error;
+    return path;
+  }
+
   return {
     isConfigured: isConfigured,
     getClient: getClient,
@@ -198,5 +276,9 @@ window.PortfolioDB = (function () {
     signIn: signIn,
     signOut: signOut,
     getSession: getSession,
+    fetchSiteSettings: fetchSiteSettings,
+    saveSiteSettings: saveSiteSettings,
+    heroImageUrl: heroImageUrl,
+    uploadHeroImage: uploadHeroImage,
   };
 })();

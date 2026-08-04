@@ -157,6 +157,134 @@ async function refreshList() {
   renderTable();
 }
 
+function setBannerStatus(msg) {
+  const el = $("bannerStatus");
+  if (el) el.textContent = msg || "";
+}
+
+function updateBannerPreview(settings) {
+  const box = $("bannerPreview");
+  if (!box) return;
+  const url = window.PortfolioDB.heroImageUrl(settings);
+  if (url) {
+    box.classList.add("has-image");
+    box.style.backgroundImage =
+      "linear-gradient(rgba(28,28,30,0.4), rgba(28,28,30,0.45)), url(\"" +
+      url.replace(/"/g, "%22") +
+      "\")";
+    box.textContent =
+      (settings.hero_title && settings.hero_title.trim()) || "Robert";
+  } else {
+    box.classList.remove("has-image");
+    box.style.backgroundImage = "";
+    box.textContent = "尚未設定（使用預設漸層）";
+  }
+}
+
+async function loadBannerForm() {
+  try {
+    const s = await window.PortfolioDB.fetchSiteSettings();
+    const form = $("bannerForm");
+    if (!form) return;
+    form.hero_image_url.value = s.hero_image_url || "";
+    form.hero_title.value = s.hero_title || "";
+    form.hero_subtitle.value = s.hero_subtitle || "";
+    form.hero_overlay.value =
+      s.hero_overlay != null ? s.hero_overlay : 45;
+    // 記住 path，清除時用
+    form.dataset.heroPath = s.hero_image_path || "";
+    updateBannerPreview(s);
+    setBannerStatus("");
+  } catch (err) {
+    setBannerStatus(
+      "無法讀取 Banner 設定。請先在 Supabase 執行 migration_site_settings.sql。" +
+        " 錯誤：" +
+        (err.message || err)
+    );
+  }
+}
+
+async function onSaveBanner(e) {
+  e.preventDefault();
+  setBannerStatus("儲存中…");
+  setError("");
+
+  const form = $("bannerForm");
+  const fileInput = $("hero_image_file");
+  const file = fileInput && fileInput.files && fileInput.files[0];
+
+  try {
+    let hero_image_path = form.dataset.heroPath || null;
+    let hero_image_url = (form.hero_image_url.value || "").trim() || null;
+
+    if (file) {
+      hero_image_path = await window.PortfolioDB.uploadHeroImage(file);
+      hero_image_url = null;
+    }
+
+    // 若只填 URL、沒上傳，清 path 以免舊 path 搶優先
+    if (!file && hero_image_url) {
+      hero_image_path = null;
+    }
+
+    // 都沒換圖：沿用現有
+    if (!file && !hero_image_url && form.dataset.heroPath) {
+      hero_image_path = form.dataset.heroPath;
+      hero_image_url = null;
+    }
+
+    const overlay = Number(form.hero_overlay.value);
+    const payload = {
+      id: 1,
+      hero_image_url: hero_image_url,
+      hero_image_path: hero_image_path,
+      hero_title: (form.hero_title.value || "").trim(),
+      hero_subtitle: (form.hero_subtitle.value || "").trim(),
+      hero_overlay: isNaN(overlay) ? 45 : Math.min(80, Math.max(0, overlay)),
+    };
+
+    const saved = await window.PortfolioDB.saveSiteSettings(payload);
+    form.dataset.heroPath = saved.hero_image_path || "";
+    if (fileInput) fileInput.value = "";
+    updateBannerPreview(saved);
+    setBannerStatus("Banner 已儲存。請到前台重新整理查看。");
+  } catch (err) {
+    console.error(err);
+    setBannerStatus("");
+    setError(
+      "Banner 儲存失敗：" +
+        (err.message || err) +
+        "（若提示找不到資料表，請執行 supabase/migration_site_settings.sql）"
+    );
+  }
+}
+
+async function onClearBanner() {
+  if (!confirm("確定清除 Banner 背景圖，恢復預設漸層？")) return;
+  setBannerStatus("清除中…");
+  try {
+    const form = $("bannerForm");
+    const payload = {
+      id: 1,
+      hero_image_url: null,
+      hero_image_path: null,
+      hero_title: (form.hero_title.value || "").trim(),
+      hero_subtitle: (form.hero_subtitle.value || "").trim(),
+      hero_overlay: Number(form.hero_overlay.value) || 45,
+    };
+    const saved = await window.PortfolioDB.saveSiteSettings(payload);
+    form.dataset.heroPath = "";
+    form.hero_image_url.value = "";
+    const fileInput = $("hero_image_file");
+    if (fileInput) fileInput.value = "";
+    updateBannerPreview(saved);
+    setBannerStatus("已清除背景圖。");
+  } catch (err) {
+    setError("清除失敗：" + (err.message || err));
+    setBannerStatus("");
+  }
+}
+
 async function showDashboard() {
   show($("loginPanel"), false);
   show($("dashPanel"), true);
@@ -164,6 +292,7 @@ async function showDashboard() {
   resetForm();
   try {
     await refreshList();
+    await loadBannerForm();
     setError("");
   } catch (err) {
     setError("讀取列表失敗：" + (err.message || err));
@@ -316,6 +445,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   $("logoutBtn") && $("logoutBtn").addEventListener("click", onLogout);
   $("photoForm") && $("photoForm").addEventListener("submit", onSubmitPhoto);
   $("resetFormBtn") && $("resetFormBtn").addEventListener("click", resetForm);
+  $("bannerForm") && $("bannerForm").addEventListener("submit", onSaveBanner);
+  $("clearBannerBtn") &&
+    $("clearBannerBtn").addEventListener("click", onClearBanner);
   bindTableActions();
 
   const mode = $("configHint");

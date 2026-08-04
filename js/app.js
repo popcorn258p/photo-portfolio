@@ -243,6 +243,54 @@ function applySiteConfig() {
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 }
 
+/** 套用首頁 Banner 背景與文案 */
+function applyHeroBanner(settings) {
+  const hero = document.getElementById("home") || document.querySelector(".hero");
+  if (!hero) return;
+
+  const url = window.PortfolioDB.heroImageUrl(settings);
+  const overlayPct = Math.min(
+    80,
+    Math.max(0, Number(settings && settings.hero_overlay != null ? settings.hero_overlay : 45))
+  );
+  const overlay = (overlayPct / 100).toFixed(2);
+
+  if (url) {
+    hero.classList.add("has-banner");
+    hero.style.setProperty("--hero-overlay", overlay);
+    // 圖本身用 background-image；遮罩由 .hero-overlay 負責
+    hero.style.backgroundImage = "url(\"" + url.replace(/"/g, "%22") + "\")";
+    hero.style.backgroundSize = "cover";
+    hero.style.backgroundPosition = "center center";
+  } else {
+    hero.classList.remove("has-banner");
+    hero.style.removeProperty("--hero-overlay");
+    hero.style.backgroundImage = "";
+    hero.style.backgroundSize = "";
+    hero.style.backgroundPosition = "";
+  }
+
+  const titleEl = document.getElementById("heroTitle");
+  const subEl = document.getElementById("heroSubtitle");
+  if (titleEl && settings && settings.hero_title && String(settings.hero_title).trim()) {
+    titleEl.textContent = String(settings.hero_title).trim();
+  }
+  if (subEl && settings && settings.hero_subtitle && String(settings.hero_subtitle).trim()) {
+    subEl.textContent = String(settings.hero_subtitle).trim();
+  }
+}
+
+async function loadSiteSettings() {
+  try {
+    if (!window.PortfolioDB.isConfigured()) return;
+    const settings = await window.PortfolioDB.fetchSiteSettings();
+    applyHeroBanner(settings);
+  } catch (err) {
+    // 尚未跑 migration 時不影響作品區
+    console.warn("[hero settings]", err.message || err);
+  }
+}
+
 async function loadPhotos() {
   const grid = document.getElementById("galleryGrid");
   if (grid) {
@@ -271,5 +319,6 @@ document.addEventListener("DOMContentLoaded", function () {
   window.Tracking.bindGenericClicks();
   window.Tracking.bindScrollDepth();
   window.Tracking.pushPageView();
+  loadSiteSettings();
   loadPhotos();
 });
