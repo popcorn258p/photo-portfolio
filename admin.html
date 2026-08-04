@@ -52,6 +52,42 @@
         版型說明：正方形 / 直式 / 橫式 / 主視覺（大圖）。混搭使用會更像雜誌排版。
       </p>
 
+      <!-- 首頁 Banner -->
+      <section class="admin-panel" id="bannerPanel">
+        <h2>首頁 Banner 背景</h2>
+        <p class="admin-hint">有你名字「Robert」的區塊背景圖。建議橫式、寬一點（例如 1920×1080）。</p>
+        <div class="banner-preview" id="bannerPreview">尚未設定（使用預設漸層）</div>
+        <form id="bannerForm" style="margin-top:1rem;">
+          <div class="admin-grid">
+            <div class="field full">
+              <label for="hero_image_file">上傳 Banner 圖片</label>
+              <input id="hero_image_file" name="hero_image_file" type="file" accept="image/*" />
+            </div>
+            <div class="field full">
+              <label for="hero_image_url">或貼外連網址（Flickr / CDN）</label>
+              <input id="hero_image_url" name="hero_image_url" type="url" placeholder="https://..." />
+            </div>
+            <div class="field">
+              <label for="hero_title">主標題（可空＝預設 Robert）</label>
+              <input id="hero_title" name="hero_title" type="text" placeholder="Robert" />
+            </div>
+            <div class="field">
+              <label for="hero_subtitle">副標（可空＝預設分類文字）</label>
+              <input id="hero_subtitle" name="hero_subtitle" type="text" placeholder="旅行 · 生活 · 產品 · 活動" />
+            </div>
+            <div class="field">
+              <label for="hero_overlay">文字遮罩濃度（0–80，越高字越清楚）</label>
+              <input id="hero_overlay" name="hero_overlay" type="number" min="0" max="80" value="45" />
+            </div>
+          </div>
+          <div class="admin-actions">
+            <button type="submit" class="btn btn-primary">儲存 Banner</button>
+            <button type="button" id="clearBannerBtn" class="btn btn-ghost">清除背景圖（恢復預設）</button>
+          </div>
+          <p id="bannerStatus" class="form-status" role="status"></p>
+        </form>
+      </section>
+
       <section class="admin-panel">
         <h2 id="formTitle">新增作品</h2>
         <form id="photoForm">
